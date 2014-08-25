@@ -68,18 +68,26 @@
       </div>
       <div class="span9">
 
-
-
         <!-- Section 1
         ================================================== -->
         <section id="section_1">
           <div class="page-header">
-            <h1>heading1</h1>
+            <h1>Getting Started</h1>
           </div>
           <p class="lead">
-          	some text
-          
+          	Follows Cartesian coordinate system &  Normal units.   <br>         	
           </p>
+          <p>
+          	In the below example, graphics is initialzed with <br>
+          	{			<br>
+          	  target: '#canvas',	<br>
+          	  showGrid:true,	//optional<br>
+          	  unit:50			// 1 unit is equils to 50 pixes <br>
+          	  x:2,y:1,			// co-ordinates of the center from bottom left of the target element <br>          	  				
+          	}
+          </p>
+          
+         
 	<ul class="nav nav-tabs custom-nav-tabs" >
 	<li class="active"><a href="#code1">Code</a></li>
 	<li><a href="#result1">Result</a></li>	
@@ -87,16 +95,22 @@
 
 	<div class="tab-content">
 		<div class="tab-pane active" id="code1">
-			<pre class="prettyprint">
-				var add = function(a,b){
-					return a+b;
-				}
-			</pre>
+<pre class="prettyprint linenums">
+/* Create an instance of Graphics */
+var g = GUtil.createGraphis({
+    target: '#canvas',showGrid:true,x:2,y:1,unit:50	
+});
+
+
+/* Create a rectagle */
+var rect = g.create('Rectangle',{x:3,y:2,w:2,h:1});
+
+/* draw rectangle */
+g.draw(rect);
+</pre>
 		</div>
-		<div class="tab-pane" id="result1">
-			<canvas width=600 height=400 style="background:black"></canvas>
-		</div>
-	
+		<div class="tab-pane" id="result1">	
+		</div>	
 	</div>         
         </section>
 
@@ -104,11 +118,12 @@
         ================================================== -->
         <section id="section_2">
           <div class="page-header">
-            <h1>heading1</h1>
+            <h1>Objects Pre defined</h1>
           </div>
           <p class="lead">
-          	some text
-          
+          	Pre defined objects include mathematical objects like 
+          	Line, Rectangle, Circle, Sphere and <br>          	
+          	Path: to draw set of 2d points
           </p>
 	<ul class="nav nav-tabs custom-nav-tabs" >
 	<li class="active"><a href="#code2">Code</a></li>
@@ -118,7 +133,18 @@
 	<div class="tab-content">
 		<div class="tab-pane active" id="code2">
 			<pre class="prettyprint">
-				source code here
+
+var rect = g.create('Rectangle',{x:2,y:3,strokeStyle:'green'});
+var circle = g.create('Circle',{x:3,y:1.5, r:1, fillStyle:'yellow',showFill:true});
+var line = g.create('Line',{x:1,y:2,x2:5,y2:3,strokeStyle:'blue'});
+var polarLine = g.create('Line',{type:'polar',x:4,y:4,r:3,angle:45,strokeStyle:'red'});
+var sphere = g.create('Sphere',{x:6,y:2,r:0.5,color:'blue'});
+
+/* method chaining */
+g.draw(rect).draw(circle);
+
+/* drawArray*/
+g.drawArray([line,polarLine,sphere]);
 			</pre>
 		</div>
 		<div class="tab-pane" id="result2">
@@ -127,7 +153,161 @@
 	
 	</div>         
         </section>
+        
+        
+          <!-- Section 3
+        ================================================== -->
+        <section id="section_3">
+          <div class="page-header">
+            <h1>Running Simple Animation</h1>
+          </div>
+          <p class="lead">   
+          	Create and run loop
+          </p>
+         
+         <p>
+         	var loopId= g.loop(function(t){		<br>
+          		//code.....			<br>
+          	}, time);	//time is optional   <br>   <br>
+          	
+          	         	
+          	Stop/Start a loop <br>
+          	
+          	g.startLoop(loopId); <br>
+          	g.stopLoop(loopId);	<br>
+          	g.clearLoops();	//to stop all the running loops<br>
+         </p>
+          
+          
+           <p class="lead">   
+          	
+          </p>
+         <p>
+         		
+         </p>
+          
+         
+	<ul class="nav nav-tabs custom-nav-tabs" >
+	<li class="active"><a href="#code3">Code</a></li>
+	<li><a href="#result3">Result</a></li>	
+	</ul>
 
+	<div class="tab-content">
+		<div class="tab-pane active" id="code3">
+<pre class="prettyprint linenums">
+/* Create an object instace with vx, vy being the components of velocities */
+var rect = g.create('Rectangle',{vx:5,vy:2.3,strokeStyle:'red'});
+
+/* Creating a time loop */
+g.loop(function(t){
+	/* rotate rectale in time*/
+	rect.angle = t/2; 
+	
+	/* draw the rectanle as well as update its position */
+	g.draw(rect.move());
+
+});
+</pre>
+		</div>
+		<div class="tab-pane" id="result3">	
+		</div>	
+	</div>         
+        </section>
+        
+        
+        
+           <!-- Section 4
+        ================================================== -->
+        <section id="section_3">
+          <div class="page-header">
+            <h1>Grouping the Objects for Complex Animations</h1>
+          </div>
+          <p class="lead">   
+          	Layer: a container to hold all the objects <br>
+          	we can apply the transformations like rotate, scale, etcs on layer
+          </p>
+         
+             
+         
+	<ul class="nav nav-tabs custom-nav-tabs" >
+	<li class="active"><a href="#code4">Code</a></li>
+	<li><a href="#result4">Result</a></li>	
+	</ul>
+
+	<div class="tab-content">
+		<div class="tab-pane active" id="code4">
+<pre class="prettyprint linenums">
+/*creating all necessary objects to creat a piston*/
+var c = g.create('Circle',{y:-1,r:0.5});	 
+var l1 = g.create('Line',{type:'polar',y:-1,r:0.5});	  
+var l2 = g.create('Line',{x2:0,r:2});
+var r = g.create('Rectangle',{x:0,w:2,h:1,showFill:true});	  
+var s1 = g.create('Sphere',{r:0.2});
+var s2 = g.create('Sphere',{r:0.2});
+
+/*create a layer to contain all the piston parts*/
+var layer = g.create('Layer',{w:2,h:5,scaleX:1,scaleY:1});
+layer.add(c).add(s1).add(s2).add(l1).add(l2).add(r);
+
+g.loop(function(t){			
+	g.clear();						
+	var phase = t*5;				
+	buildPiston(phase,2.5);				
+	buildPiston(phase+90,5);	
+	buildPiston(phase+180,7.5);
+	buildPiston(phase+270,10);			
+});	
+
+/* drawing the piston for the given phase angle and at position x on the grid*/	
+function buildPiston(phase,x){
+	l1.angle=phase;	
+	s1.position(l1.position2());
+	l2.position(l1.position2());			
+	l2.y2 = Math.sqrt(l2.r*l2.r-(l2.x2-l2.x)*(l2.x2-l2.x))+l2.y;
+	s2.position(l2.position2());			
+	r.y = l2.y2;				
+	layer.x=x;layer.y=4;/* translate the whole layer to the position x,y*/		
+	g.draw(layer);	
+}
+</pre>
+		</div>
+		<div class="tab-pane" id="result4">	
+		</div>	
+	</div>         
+        </section>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+	<div style="display:none;">
+		<canvas id="canvas" width=600 height=400 style="background:black"></canvas>
+	</div>
 
 
 
@@ -167,14 +347,21 @@
     <script src="./bootstrapfiles/bootstrap-carousel.js"></script>
     <script src="./bootstrapfiles/bootstrap-typeahead.js"></script>
     <script src="./bootstrapfiles/bootstrap-affix.js"></script>
-
     <script src="./bootstrapfiles/holder.js"></script>
     <script src="./bootstrapfiles/prettify.js"></script>
-
     <script src="./bootstrapfiles/application.js"></script>
     
-     <script src="./js/custom.js"></script>
+    
+    
+    
 
+    
+
+<script src="js/graphics-mathUtil.js"></script>
+<script src="js/graphics-objectUtil.js"></script>
+<script src="js/graphics-drawingUtil.js"></script>
+<script src="js/graphics-controller.js"></script>
+  <script src="js/custom.js"></script>
 
    
 

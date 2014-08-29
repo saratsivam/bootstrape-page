@@ -2,6 +2,110 @@
 
 
 (function() {
+  var keyUtil = {
+    keyCodes:{0: 48, 1: 49, 2: 50, 3: 51, 4: 52, 5: 53, 6: 54, 7: 55, 8: 56, 9: 57,A: 65, B: 66, C: 67, D: 68, E: 69, F: 70, G: 71, H: 72, I: 73, J: 74, K: 75, L: 76, M: 77, N: 78, O: 79, P: 80, Q: 81, R: 82, S: 83, T: 84, U: 85, V: 86, W: 87, X: 88, Y: 89, Z:90,enter:13, up:38, down:40, right:39, left:37, esc:27, spacebar:32, ctrl:17, alt:18, shift:16,tab:9,backspace:8},
+    keyNames:{8: "backspace", 9: "tab", 13: "enter", 16: "shift", 17: "ctrl", 18: "alt", 27: "esc", 32: "spacebar", 37: "left", 38: "up", 39: "right", 40: "down", 48: "0", 49: "1", 50: "2", 51: "3", 52: "4", 53: "5", 54: "6", 55: "7", 56: "8", 57: "9", 65: "A", 66: "B", 67: "C", 68: "D", 69: "E", 70: "F", 71: "G", 72: "H", 73: "I", 74: "J", 75: "K", 76: "L", 77: "M", 78: "N", 79: "O", 80: "P", 81: "Q", 82: "R", 83: "S", 84: "T", 85: "U", 86: "V", 87: "W", 88: "X", 89: "Y", 90: "Z"},
+    onKeyEvent: function(eventName, impl) {
+    var that = this;
+      $(document).bind(eventName, function(e) {
+        var keyName = that.keyNames[e.keyCode];
+        if (impl[keyName]) {
+          impl[keyName](e);
+        }
+      });
+    }
+  };
+  
+  var mathUtil = {
+  distance: function(p1, p2) {
+    return Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
+  },
+  getRand: function(a, b) {
+    return Math.round(a + (b - a) * Math.random());
+  },
+  getRandf: function(a, b) {
+    return a + (b - a) * Math.random();
+  },
+  getRad: function(deg) {
+    return deg * Math.PI / 180;
+  },
+  getlineMap: function(x, a, b, c, d) {
+    //y in c d for x in a b   
+    //y-c/(d-c) = x-a/(b-a) 
+    return (x - a) * (d - c) / (b - a) + c;
+  }
+};
+
+  var colorUtil = {
+  getRandColor: function() {
+    return this.getColorFromArray([mathUtil.getRand(0, 255), mathUtil.getRand(0, 255), mathUtil.getRand(0, 255)]);
+  },
+  getColorFromArray: function(a) {
+    return 'rgb(' + a[0] + ',' + a[1] + ',' + a[2] + ')';
+  },
+  hsvToRgb: function(h, s, v) {
+    /*hsv in the set [0 1] and rgb in the set[0,255]
+     */
+    var r, g, b;
+    var i = Math.floor(h * 6);
+    var f = h * 6 - i;
+    var p = v * (1 - s);
+    var q = v * (1 - f * s);
+    var t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+      case 0:
+        r = v, g = t, b = p;
+        break;
+      case 1:
+        r = q, g = v, b = p;
+        break;
+      case 2:
+        r = p, g = v, b = t;
+        break;
+      case 3:
+        r = p, g = q, b = v;
+        break;
+      case 4:
+        r = t, g = p, b = v;
+        break;
+      case 5:
+        r = v, g = p, b = q;
+        break;
+    }
+
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  },
+  rgbToHsv: function(r, g, b) {
+    /*rgb in the set[0,255] and hsv in the set [0 1]  
+     */
+    r = r / 255, g = g / 255, b = b / 255;
+    var max = Math.max(r, g, b),
+      min = Math.min(r, g, b);
+    var h, s, v = max;
+
+    var d = max - min;
+    s = max === 0 ? 0 : d / max;
+
+    if (max == min) {
+      h = 0; // achromatic
+    } else {
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
+      }
+      h /= 6;
+    }
+    return [h, s, v];
+  }
+};
+
   GUtil = {
     createGraphis: function(options) {
 
@@ -600,8 +704,10 @@
       graphics.clear();
       return graphics;
 
-    }
-
+    },
+    KeyEvents:keyUtil,
+    Math:mathUtil,
+    Color:colorUtil
   };
 
 
@@ -619,91 +725,5 @@ window.requestAnimFrame = (function() {
 
 
 
-mathUtil = {
-  distance: function(p1, p2) {
-    return Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
-  },
-  getRand: function(a, b) {
-    return Math.round(a + (b - a) * Math.random());
-  },
-  getRandf: function(a, b) {
-    return a + (b - a) * Math.random();
-  },
-  getRad: function(deg) {
-    return deg * Math.PI / 180;
-  },
-  getlineMap: function(x, a, b, c, d) {
-    //y in c d for x in a b   
-    //y-c/(d-c) = x-a/(b-a) 
-    return (x - a) * (d - c) / (b - a) + c;
-  }
-};
-colorUtil = {
-  getRandColor: function() {
-    return getColorFromArray([getRand(0, 255), getRand(0, 255), getRand(0, 255)]);
-  },
-  getColorFromArray: function(a) {
-    return 'rgb(' + a[0] + ',' + a[1] + ',' + a[2] + ')';
-  },
-  hsvToRgb: function(h, s, v) {
-    /*hsv in the set [0 1] and rgb in the set[0,255]
-     */
-    var r, g, b;
-    var i = Math.floor(h * 6);
-    var f = h * 6 - i;
-    var p = v * (1 - s);
-    var q = v * (1 - f * s);
-    var t = v * (1 - (1 - f) * s);
-    switch (i % 6) {
-      case 0:
-        r = v, g = t, b = p;
-        break;
-      case 1:
-        r = q, g = v, b = p;
-        break;
-      case 2:
-        r = p, g = v, b = t;
-        break;
-      case 3:
-        r = p, g = q, b = v;
-        break;
-      case 4:
-        r = t, g = p, b = v;
-        break;
-      case 5:
-        r = v, g = p, b = q;
-        break;
-    }
 
-    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
-  },
-  rgbToHsv: function(r, g, b) {
-    /*rgb in the set[0,255] and hsv in the set [0 1]  
-     */
-    r = r / 255, g = g / 255, b = b / 255;
-    var max = Math.max(r, g, b),
-      min = Math.min(r, g, b);
-    var h, s, v = max;
 
-    var d = max - min;
-    s = max === 0 ? 0 : d / max;
-
-    if (max == min) {
-      h = 0; // achromatic
-    } else {
-      switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-      h /= 6;
-    }
-    return [h, s, v];
-  }
-};
